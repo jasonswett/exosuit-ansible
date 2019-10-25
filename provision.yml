@@ -1,0 +1,51 @@
+---
+- hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  module_defaults:
+    apt:
+      force_apt_get: yes
+  remote_user: ubuntu
+  roles:
+    - geerlingguy.git
+    - geerlingguy.nodejs
+    - geerlingguy.ruby
+    - geerlingguy.passenger
+  tasks:
+
+    - name: Ensure app directory exists and is writeable
+      file:
+        path: "{{ app_directory }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: 0755
+
+    - name: Install Bundler
+      command: bash -lc "gem install bundler"
+
+    - name: Install libpq-dev
+      apt:
+        name: libpq-dev
+        state: present
+
+    - name: Install Yarn
+      npm:
+        name: yarn
+        global: yes
+
+    - name: Update Passenger config
+      template:
+        src: passenger.j2
+        dest: /etc/nginx/sites-available/passenger
+      notify: restart nginx
+
+    - name: Touch env file
+      copy:
+        content: ""
+        dest: /etc/nginx/sites-enabled/env
+        force: no
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: 0644

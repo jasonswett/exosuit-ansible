@@ -1,0 +1,22 @@
+---
+app_directory: /var/www/app
+app_user: www-data
+
+# Variables for Passenger and Nginx.
+passenger_server_name: 0.0.0.0
+passenger_app_root: /var/www/app/public
+passenger_app_env: production
+passenger_ruby: /usr/local/bin/ruby
+
+# Variables for Ruby installation.
+ruby_install_from_source: true
+ruby_download_url: https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.5.tar.gz
+ruby_version: 2.6.5
+
+nodejs_version: "10.x"
+yarn_version: 1.19.0
+
+app_secrets:
+  development: 04da15b6684bc16c9bcebc1de69ce2fcfa19b237c40c7ae94c467f258c2e3480545cc82b8a45ea85062cef294f04e6727c07e8593815211fe80a7af09f4145a3
+  test: 40bdca2fe238fac93010035871d61d2fd00db39c2a2f9dda4179996985a7dbeaac9e013276491735414b6f82e642c21a1c6a1f81b37ce5d124464c8e46723d33
+  production: d0ea2e8e275c1c020266c133f962fc913a0ef08aaca7b268239f12133413767aa6fa5575139b6c4a4c8f5104201551af80bebf535cb56c7c679c3394d4ea7df6

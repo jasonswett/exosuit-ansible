@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ansible-playbook -v -i hosts deploy.yml --private-key ~/.ssh/intolerable-awful-river

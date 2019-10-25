@@ -1,0 +1,64 @@
+---
+- hosts: all
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  module_defaults:
+    apt:
+      force_apt_get: yes
+
+  remote_user: ubuntu
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+  tasks:
+    - name: Update app
+      git:
+        repo: https://github.com/jasonswett/mothership.git
+        version: master
+        dest: "{{ app_directory }}"
+        accept_hostkey: true
+        force: yes
+      register: app_updated
+      notify: restart nginx
+
+    - name: Install required dependencies with Bundler
+      command: "bundle install --path vendor/bundle chdir={{ app_directory }}"
+      when: app_updated.changed == true
+      notify: restart nginx
+
+    - name: Ensure secrets file is present
+      template:
+        src: templates/secrets.yml.j2
+        dest: "{{ app_directory }}/config/secrets.yml"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: 0664
+      notify: restart nginx
+
+    - name: Install Yarn packages from package.json
+      yarn:
+        path: "{{ app_directory }}"
+
+    - name: Precompile assets
+      command: "{{ item }} chdir={{ app_directory }}"
+      with_items:
+        - bundle exec rails assets:precompile
+      environment: production
+      when: app_updated.changed == true
+      notify: restart nginx
+
+    - name: Ensure application has correct user for files
+      file:
+        path: "{{ app_directory }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        recurse: yes
+      notify: restart nginx
