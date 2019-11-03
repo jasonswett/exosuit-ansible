@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require 'netrc'
+require 'open3'
+
+netrc_file_path = "#{File.expand_path('~')}/.netrc"
+raise 'netrc file missing' unless File.exist?(netrc_file_path)
+username, password = Netrc.read(netrc_file_path)['git.exosuit.io']
+
+repo_url, _ = Open3.capture2(
+	'git remote get-url exosuit',
+	chdir: ARGV[0]
+)
+
+puts "https://#{username}:#{password}@" + repo_url.split('https://').last
