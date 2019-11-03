@@ -1,6 +1,7 @@
 #!/bin/sh
 
-REPO_URL=$(ruby ~/repo_url $1)
+#REPO_URL=$(ruby ~/repo_url $1)
+REPO_URL=$1
 
 ansible-playbook --verbose -i hosts deploy.yml \
   --private-key ~/.ssh/intolerable-awful-river \
