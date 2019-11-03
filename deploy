@@ -1,3 +1,7 @@
 #!/bin/sh
 
-ansible-playbook -v -i hosts deploy.yml --private-key ~/.ssh/intolerable-awful-river
+REPO_URL=$(ruby ~/repo_url $(pwd))
+
+ansible-playbook --verbose -i playbooks/hosts playbooks/deploy.yml \
+  --private-key ~/.ssh/intolerable-awful-river \
+  --extra-vars "repo_url=$REPO_URL"
